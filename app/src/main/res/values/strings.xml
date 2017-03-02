@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">GithubStargazers</string>
+    <string name="logo">logo</string>
+    <string name="owner_username">Github user</string>
+    <string name="repository_name">Repository name</string>
+    <string name="get_stargazers">Get stargazers</string>
+</resources>
