@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.ngallazzi.githubstargazers.DisplayResultsActivity;
 import com.ngallazzi.githubstargazers.MainActivity;
 import com.ngallazzi.githubstargazers.R;
 import com.ngallazzi.githubstargazers.models.Stargazer;
@@ -30,7 +31,6 @@ public class StargazerAdapter extends RecyclerView.Adapter<StargazerAdapter.View
     private final String TAG = StargazerAdapter.class.getSimpleName();
     private ArrayList<Stargazer> mStargazers;
     private Context mContext;
-    private MainActivity mActivity;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public CircleImageView civUserAvatar;
@@ -45,7 +45,6 @@ public class StargazerAdapter extends RecyclerView.Adapter<StargazerAdapter.View
     public StargazerAdapter(ArrayList<Stargazer> myDataset, Context context) {
         mStargazers = myDataset;
         mContext = context;
-        mActivity= (MainActivity) context;
     }
 
     @Override

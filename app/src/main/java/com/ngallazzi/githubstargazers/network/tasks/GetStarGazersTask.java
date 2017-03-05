@@ -6,7 +6,10 @@ import com.ngallazzi.githubstargazers.models.Stargazer;
 import com.ngallazzi.githubstargazers.network.GitHub;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import okhttp3.Headers;
+import okhttp3.internal.http2.Header;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -26,15 +29,17 @@ public class GetStarGazersTask {
         this.mCallbacks = callbacks;
     }
 
-    public void execute(){
+    public void execute(int page){
         mCallbacks.onStarted();
         GitHub service = new MyHttpClient().retrofit.create(GitHub.class);
-        Call<ArrayList<Stargazer>> call = service.getStargazers(mOwner,mRepository);
+        Call<ArrayList<Stargazer>> call = service.getStargazers(mOwner,mRepository,page);
         call.enqueue(new Callback<ArrayList<Stargazer>>() {
             @Override
             public void onResponse(Call<ArrayList<Stargazer>> call, Response<ArrayList<Stargazer>> response) {
                 if (response.isSuccessful()){
-                    mCallbacks.onSuccess(response.body());
+                    Headers headers = response.headers();
+                    int totalPages = getTotalPages(headers);
+                    mCallbacks.onSuccess(response.body(),totalPages);
                 }else {
                     mCallbacks.onError(response.message());
                 }
@@ -47,9 +52,21 @@ public class GetStarGazersTask {
         });
     }
 
+    public int getTotalPages(Headers headers){
+        int pageCount = 1;
+        String link = headers.get("Link");
+        if (link!=null){
+            String [] elements = link.split(";");
+            int position = elements[1].lastIndexOf("page=");
+            String page = elements[1].substring(position,elements[1].length()-1);
+            pageCount = Integer.valueOf(page.replace("page=",""));
+        }
+        return pageCount;
+    }
+
     public interface StarGazersTaskCallbacks{
         void onStarted();
-        void onSuccess(ArrayList<Stargazer> stargazers);
+        void onSuccess(ArrayList<Stargazer> stargazers, int totalPages);
         void onError(String error);
     }
 }

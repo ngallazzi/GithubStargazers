@@ -1,6 +1,7 @@
 package com.ngallazzi.githubstargazers;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Parcelable;
@@ -42,19 +43,10 @@ public class MainActivity extends AppCompatActivity {
     AutoCompleteTextView actvRepositories;
     @BindView(R.id.btSearch)
     Button btSearch;
-    @BindView(R.id.rvStarGazers)
-    RecyclerView rvStarGazers;
-    @BindView(R.id.tvNoStargazers)
-    TextView tvNoStargazers;
-    StargazerAdapter mAdapter;
-    ArrayList<Stargazer> mStargazersArrayList;
     String mOwner,mRepository;
     @BindView(R.id.dbpLoading)
     DotProgressBar dbpLoading;
     GetReposTask.ReposTaskCallbacks mReposTaskCallbacks;
-    GetStarGazersTask.StarGazersTaskCallbacks mStarGazersTaskCallbacks;
-    private final String SAVED_RECYCLER_VIEW_STATUS_ID = "rv_status_id";
-    Parcelable listState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,20 +55,9 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         mContext = this;
         initReposTaskCallbacks();
-        initStarGazersTaskCallbacks();
-        initRvStarGazers();
         initBtSearch();
         initEtOwner();
         initActvRepositories();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (listState!=null){
-            Log.v(TAG,"List state: " + listState.toString());
-            new GetStarGazersTask(mOwner,mRepository,mStarGazersTaskCallbacks).execute();
-        }
     }
 
     public void initReposTaskCallbacks(){
@@ -151,53 +132,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void initStarGazersTaskCallbacks(){
-        mStarGazersTaskCallbacks = new GetStarGazersTask.StarGazersTaskCallbacks() {
-            @Override
-            public void onStarted() {
-                hideKeyboard();
-                dbpLoading.setVisibility(View.VISIBLE);
-            }
 
-            @Override
-            public void onSuccess(ArrayList<Stargazer> foundStargazers) {
-                dbpLoading.setVisibility(View.GONE);
-                mStargazersArrayList.clear();
-                if (foundStargazers.size()==0){
-                    tvNoStargazers.setVisibility(View.VISIBLE);
-                    rvStarGazers.setVisibility(View.GONE);
-                }else {
-                    for (Stargazer s: foundStargazers){
-                        mStargazersArrayList.add(s);
-                    }
-                    mAdapter.notifyDataSetChanged();
-                    if (listState!=null){
-                        rvStarGazers.getLayoutManager().onRestoreInstanceState(listState);
-                        Log.v(TAG,"Restoring recycler view state");
-                    }
-                    tvNoStargazers.setVisibility(View.GONE);
-                    rvStarGazers.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onError(String error) {
-                dbpLoading.setVisibility(View.GONE);
-                Toast.makeText(mContext,error,Toast.LENGTH_SHORT).show();
-            }
-        };
-    }
-
-    public void initRvStarGazers(){
-        mStargazersArrayList = new ArrayList<>();
-        rvStarGazers.setHasFixedSize(true);
-        // use a linear layout manager
-        RecyclerView.LayoutManager layoutManager  = new LinearLayoutManager(this);
-        rvStarGazers.setLayoutManager(layoutManager);
-        // specify an adapter (see also next example)
-        mAdapter = new StargazerAdapter(mStargazersArrayList,mContext);
-        rvStarGazers.setAdapter(mAdapter);
-    }
 
     public void initBtSearch(){
         btSearch.setOnClickListener(new View.OnClickListener() {
@@ -205,7 +140,10 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 mRepository = actvRepositories.getText().toString();
                 if (!mRepository.isEmpty()){
-                    new GetStarGazersTask(mOwner,mRepository,mStarGazersTaskCallbacks).execute();
+                    Intent intent = new Intent(mContext,DisplayResultsActivity.class);
+                    intent.putExtra(getString(R.string.owner_id),mOwner);
+                    intent.putExtra(getString(R.string.repository_id),mRepository);
+                    startActivity(intent);
                 }else{
                     Toast.makeText(mContext,getString(R.string.please_select_repository),Toast.LENGTH_SHORT).show();
                 }
@@ -213,21 +151,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void hideKeyboard(){
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(getString(R.string.owner_id),mOwner);
         outState.putString(getString(R.string.repository_id),mRepository);
-        outState.putParcelableArrayList(getString(R.string.repositories_array_list_id),mStargazersArrayList);
-        Parcelable listState = rvStarGazers.getLayoutManager().onSaveInstanceState();
-        outState.putParcelable(SAVED_RECYCLER_VIEW_STATUS_ID, listState);
         super.onSaveInstanceState(outState);
     }
 
@@ -237,7 +164,6 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState!=null){
             mOwner = savedInstanceState.getString(getString(R.string.owner_id));
             mRepository = savedInstanceState.getString(getString(R.string.repository_id));
-            listState = savedInstanceState.getParcelable(SAVED_RECYCLER_VIEW_STATUS_ID);
         }
     }
 }

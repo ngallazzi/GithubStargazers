@@ -34,7 +34,7 @@ public class GetStarGazersTaskTest {
                 }
 
                 @Override
-                public void onSuccess(ArrayList<Stargazer> stargazers) {
+                public void onSuccess(ArrayList<Stargazer> stargazers, int page) {
                     mStargazers = stargazers;
                     latch.countDown();
                 }
@@ -44,12 +44,9 @@ public class GetStarGazersTaskTest {
                     Assert.fail("Error executing task: " + error);
                     latch.countDown();
                 }
-            }).execute();
+            }).execute(1);
             latch.await();
-            for (Stargazer s: mStargazers){
-                Assert.assertNotNull(s.login);
-                Assert.assertNotNull(s.avatarUrl);
-            }
+            assertNotNull(mStargazers);
         }catch (Exception e){
             Assert.fail("Error executing task: " + e.getMessage());
             latch.countDown();

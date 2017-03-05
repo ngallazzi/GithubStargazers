@@ -21,7 +21,7 @@ public interface GitHub {
             "Accept: application/json"
     })
     @GET("repos/{owner}/{repo}/stargazers")
-    Call<ArrayList<Stargazer>> getStargazers(@Path("owner") String owner, @Path("repo") String repository);
+    Call<ArrayList<Stargazer>> getStargazers(@Path("owner") String owner, @Path("repo") String repository,@Query("page") int page);
     @GET("users/{owner}/repos")
     Call<ArrayList<Repo>> getRepos(@Path("owner") String owner);
 }
