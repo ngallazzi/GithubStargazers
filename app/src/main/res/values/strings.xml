@@ -4,4 +4,8 @@
     <string name="owner_username">Github user</string>
     <string name="repository_name">Repository name</string>
     <string name="get_stargazers">Get stargazers</string>
+    <string name="owner_id" translatable="false">owner_id</string>
+    <string name="repository_id" translatable="false">repository_id</string>
+    <string name="stargazers_id" translatable="false">stargazers_id</string>
+    <string name="repositories_array_list_id" translatable="false">repositories_array_list_id</string>
 </resources>

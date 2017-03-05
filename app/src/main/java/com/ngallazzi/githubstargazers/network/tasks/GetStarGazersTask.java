@@ -1,12 +1,12 @@
-package com.ngallazzi.githubstargazers.network;
+package com.ngallazzi.githubstargazers.network.tasks;
 
 import android.content.Context;
 
 import com.ngallazzi.githubstargazers.models.Stargazer;
+import com.ngallazzi.githubstargazers.network.GitHub;
 
 import java.util.ArrayList;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -15,22 +15,20 @@ import retrofit2.Response;
  * Created by Nicola on 2017-03-02.
  */
 
-public class GetStarGlazersTask {
-    final String TAG = GetStarGlazersTask.class.getSimpleName();
-    private Context mContext;
+public class GetStarGazersTask {
+    final String TAG = GetStarGazersTask.class.getSimpleName();
     private String mOwner,mRepository;
-    private StarGlazersTaskCallbacks mCallbacks;
+    private StarGazersTaskCallbacks mCallbacks;
 
-    public GetStarGlazersTask(Context context, String owner, String repository) {
-        this.mContext = context;
+    public GetStarGazersTask(String owner, String repository, StarGazersTaskCallbacks callbacks) {
         this.mOwner = owner;
         this.mRepository = repository;
-        this.mCallbacks = (StarGlazersTaskCallbacks) mContext;
+        this.mCallbacks = callbacks;
     }
 
     public void execute(){
         mCallbacks.onStarted();
-        ApiService service = new MyHttpClient().sRetrofit.create(ApiService.class);
+        GitHub service = new MyHttpClient().retrofit.create(GitHub.class);
         Call<ArrayList<Stargazer>> call = service.getStargazers(mOwner,mRepository);
         call.enqueue(new Callback<ArrayList<Stargazer>>() {
             @Override
@@ -38,20 +36,20 @@ public class GetStarGlazersTask {
                 if (response.isSuccessful()){
                     mCallbacks.onSuccess(response.body());
                 }else {
-                    mCallbacks.onError();
+                    mCallbacks.onError(response.message());
                 }
             }
 
             @Override
             public void onFailure(Call<ArrayList<Stargazer>> call, Throwable t) {
-                mCallbacks.onError();
+                mCallbacks.onError(t.getMessage());
             }
         });
     }
 
-    public interface StarGlazersTaskCallbacks{
+    public interface StarGazersTaskCallbacks{
         void onStarted();
         void onSuccess(ArrayList<Stargazer> stargazers);
-        void onError();
+        void onError(String error);
     }
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="please_select_repository">Please select a valid repository</string>
+    <string name="no_stargazers">No stargazers found!</string>
+</resources>

@@ -34,7 +34,11 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     // Http calls
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
-    compile 'com.squareup.okhttp:okhttp:2.4.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+    // Progress bar
+    compile 'com.github.silvestrpredko:dot-progress-bar:1.1'
+    // For avatars
+    compile 'com.squareup.picasso:picasso:2.5.2'
+    // Testing
     testCompile 'junit:junit:4.12'
 }
