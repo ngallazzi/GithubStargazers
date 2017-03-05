@@ -46,6 +46,7 @@ public class GetReposTaskTest {
             Assert.assertNotNull(firstRepo);
         }catch (Exception e){
             Assert.fail("Error executing task: " + e.getMessage());
+            latch.countDown();
         }
     }
 }

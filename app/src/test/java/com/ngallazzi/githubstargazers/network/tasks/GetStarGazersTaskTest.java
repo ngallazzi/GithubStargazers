@@ -52,6 +52,7 @@ public class GetStarGazersTaskTest {
             }
         }catch (Exception e){
             Assert.fail("Error executing task: " + e.getMessage());
+            latch.countDown();
         }
     }
 }
